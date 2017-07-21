@@ -1,9 +1,11 @@
 package ness.edu.sqlite.dialogs;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import ness.edu.sqlite.R;
+import ness.edu.sqlite.models.Todo;
 import ness.edu.sqlite.sqlite.DAO;
 
 /**
@@ -41,11 +44,20 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
         String mission = etMission.getText().toString();
         String importance = spImportance.getSelectedItem().toString();
 
+
+
+
         //spinner -> selected
         DAO.getInstance(getContext()).addTodo(mission, importance);
 
         dismiss();
 
         //prepared statements
+
+        //Notify the listeners:
+        Todo todo = new Todo(mission, importance);
+        Intent intent = new Intent("addedTodo");
+        intent.putExtra("todo", todo);
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 }

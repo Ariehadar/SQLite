@@ -1,10 +1,13 @@
 package ness.edu.sqlite.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * A Todos Model class
  */
 
-public class Todo {
+public class Todo implements Parcelable {
     //Proprties:
     private int id;
     private String mission;
@@ -51,4 +54,31 @@ public class Todo {
                 ", importance='" + importance + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.mission);
+        dest.writeString(this.importance);
+    }
+    protected Todo(Parcel in) {
+        this.id = in.readInt();
+        this.mission = in.readString();
+        this.importance = in.readString();
+    }
+    public static final Parcelable.Creator<Todo> CREATOR = new Parcelable.Creator<Todo>() {
+        @Override
+        public Todo createFromParcel(Parcel source) {
+            return new Todo(source);
+        }
+
+        @Override
+        public Todo[] newArray(int size) {
+            return new Todo[size];
+        }
+    };
 }

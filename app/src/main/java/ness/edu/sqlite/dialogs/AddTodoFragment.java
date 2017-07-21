@@ -1,6 +1,7 @@
 package ness.edu.sqlite.dialogs;
 
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
@@ -47,10 +48,14 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
         TodosDBHelper helper = new TodosDBHelper(getContext());
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        db.execSQL("INSERT INTO Todos(mission, importance)" +
-                  " VALUES('" + mission +"', '" + importance + "');");
-        //TODO discuss SQL INJECTION
+        //maps key value pairs.
+        ContentValues values = new ContentValues();
+        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_MISSION, mission);
+        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_IMPORTANCE, importance);
 
+        db.insert(TodosDBHelper.TodosContract.TBL_TODOS, null, values);
         dismiss();
+
+        //prepared statements
     }
 }

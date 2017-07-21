@@ -1,4 +1,4 @@
-package ness.edu.sqlite;
+package ness.edu.sqlite.sqlite;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

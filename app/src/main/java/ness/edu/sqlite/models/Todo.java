@@ -17,7 +17,7 @@ public class Todo {
     }
 
     //Constructor for the SELECT:
-    public Todo(String mission, String importance, int id) {
+    public Todo(int id, String mission, String importance) {
         this.id = id;
         this.mission = mission;
         this.importance = importance;

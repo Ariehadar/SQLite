@@ -1,8 +1,6 @@
 package ness.edu.sqlite.dialogs;
 
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
@@ -14,7 +12,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import ness.edu.sqlite.R;
-import ness.edu.sqlite.TodosDBHelper;
+import ness.edu.sqlite.sqlite.DAO;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,16 +42,8 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
         String importance = spImportance.getSelectedItem().toString();
 
         //spinner -> selected
+        DAO.getInstance(getContext()).addTodo(mission, importance);
 
-        TodosDBHelper helper = new TodosDBHelper(getContext());
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        //maps key value pairs.
-        ContentValues values = new ContentValues();
-        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_MISSION, mission);
-        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_IMPORTANCE, importance);
-
-        db.insert(TodosDBHelper.TodosContract.TBL_TODOS, null, values);
         dismiss();
 
         //prepared statements

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import ness.edu.sqlite.dialogs.AddTodoFragment;
+import ness.edu.sqlite.sqlite.DAO;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addTodo() {
+        DAO instance = DAO.getInstance(this);
+
+
         new AddTodoFragment().show(getSupportFragmentManager(), "todo");
     }
 

@@ -123,4 +123,11 @@ public class DAO {
                 null/*new String[]{String.valueOf(todoID)}*/
                 );
     }
+
+    public void deleteTodo(int id) {
+        db.delete(TodosDBHelper.TodosContract.TBL_TODOS,
+                TodosDBHelper.TodosContract.TBL_TODOS_COL_ID + " = ?",
+                new String[]{String.valueOf(id)}
+                );
+    }
 }

@@ -28,6 +28,7 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
     public static final String ARG_ACTION = "action";
     public static final String INTENT_ACTION_UPDATE = "updatedTodo";
     public static final String INTENT_ACTION_INSERT = "insertedTodo";
+    public static final String INTENT_ACTION_DELETE = "deleteTodo";
 
     //private fields:
     private int action;

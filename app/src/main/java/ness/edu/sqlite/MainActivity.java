@@ -88,6 +88,20 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver todoDeletedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Todo todo = intent.getParcelableExtra("todo");
+            for (int i = 0; i < todos.size(); i++) {
+                if (todos.get(i).getId() == todo.getId()){
+                    todos.remove(i);
+                    adapter.notifyItemRemoved(i);
+                    break;
+                }
+            }
+        }
+    };
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -95,9 +109,11 @@ public class MainActivity extends AppCompatActivity {
         //import static ness.edu.sqlite.dialogs.AddTodoFragment.INTENT_ACTION_INSERT;
         IntentFilter insertFilter = new IntentFilter(AddTodoFragment.INTENT_ACTION_INSERT);
         IntentFilter updateFilter = new IntentFilter(AddTodoFragment.INTENT_ACTION_UPDATE);
+        IntentFilter deleteFilter = new IntentFilter(AddTodoFragment.INTENT_ACTION_DELETE);
 
         mgr.registerReceiver(todosInsertedReceiver, insertFilter);
         mgr.registerReceiver(todoUpdatedReceiver, updateFilter);
+        mgr.registerReceiver(todoDeletedReceiver, deleteFilter);
 
     }
 
@@ -107,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(this);
         mgr.unregisterReceiver(todosInsertedReceiver);
         mgr.unregisterReceiver(todoUpdatedReceiver);
+        mgr.unregisterReceiver(todoDeletedReceiver);
     }
 
     private void addTodo() {
@@ -172,20 +189,32 @@ public class MainActivity extends AppCompatActivity {
             TextView tvMission;
             TextView tvImportance;
             Todo model;
+            FloatingActionButton fabDelete;
             AppCompatActivity activity;
 
             public TodoViewHolder(View v) {
                 super(v);
                 tvImportance = v.findViewById(R.id.tvImportance);
                 tvMission = v.findViewById(R.id.tvMission);
+                fabDelete = v.findViewById(R.id.fabDelete);
                 v.setOnClickListener(this);
+                fabDelete.setOnClickListener(this);
             }
 
             @Override
             public void onClick(View view) {
-                //MainActivity a = (MainActivity) view.getContext();
-                AddTodoFragment dialog = AddTodoFragment.newInstance(AddTodoFragment.ACTION_UPDATE, model);
-                dialog.show(activity.getSupportFragmentManager(), "updateDialog");
+                if (view == fabDelete){
+                    DAO.getInstance(activity).deleteTodo(model.getId());
+
+                    Intent intent = new Intent(AddTodoFragment.INTENT_ACTION_DELETE);
+                    intent.putExtra("todo", model); //parcelable.
+                    LocalBroadcastManager.getInstance(activity).
+                            sendBroadcast(intent);
+                }else {
+                    //MainActivity a = (MainActivity) view.getContext();
+                    AddTodoFragment dialog = AddTodoFragment.newInstance(AddTodoFragment.ACTION_UPDATE, model);
+                    dialog.show(activity.getSupportFragmentManager(), "updateDialog");
+                }
             }
         }
     }

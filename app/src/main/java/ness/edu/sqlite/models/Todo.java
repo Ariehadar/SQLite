@@ -2,13 +2,14 @@ package ness.edu.sqlite.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * A Todos Model class
  */
 
-public class Todo implements Parcelable {
-    //Proprties:
+public class Todo implements Parcelable, Comparable<Todo> {
+    //Properties:
     private int id;
     private String mission;
     private String importance;
@@ -81,4 +82,17 @@ public class Todo implements Parcelable {
             return new Todo[size];
         }
     };
+
+    @Override
+    public int compareTo(@NonNull Todo todo) {
+        int idDiff = id - todo.id;
+        if (idDiff != 0)
+            return idDiff;
+
+        int missionDiff = mission.compareTo(todo.mission);
+        if (missionDiff!=0)
+            return missionDiff;
+
+        return importance.compareTo(todo.importance);
+    }
 }

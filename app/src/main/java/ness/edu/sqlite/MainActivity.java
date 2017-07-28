@@ -19,10 +19,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 import ness.edu.sqlite.dialogs.AddTodoFragment;
 import ness.edu.sqlite.models.Todo;
 import ness.edu.sqlite.sqlite.DAO;
+
+
+
 
 public class MainActivity extends AppCompatActivity {
     List<Todo> todos;
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 //        }, new IntentFilter("addedTodo"));
     }
 
-    BroadcastReceiver todosUpdatedReceiver = new BroadcastReceiver() {
+    BroadcastReceiver todosInsertedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Todo todo = intent.getParcelableExtra("todo");
@@ -71,23 +75,46 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    BroadcastReceiver todoUpdatedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Todo todo = intent.getParcelableExtra("todo");
+            for (int i = 0; i < todos.size(); i++) {
+                if (todos.get(i).getId() == todo.getId()){
+                    todos.set(i, todo);
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    };
+
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(this);
-        IntentFilter actionFilter = new IntentFilter("addedTodo");
-        mgr.registerReceiver(todosUpdatedReceiver, actionFilter);
+        //import static ness.edu.sqlite.dialogs.AddTodoFragment.INTENT_ACTION_INSERT;
+        IntentFilter insertFilter = new IntentFilter(AddTodoFragment.INTENT_ACTION_INSERT);
+        IntentFilter updateFilter = new IntentFilter(AddTodoFragment.INTENT_ACTION_UPDATE);
+
+        mgr.registerReceiver(todosInsertedReceiver, insertFilter);
+        mgr.registerReceiver(todoUpdatedReceiver, updateFilter);
+
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         LocalBroadcastManager mgr = LocalBroadcastManager.getInstance(this);
-        mgr.unregisterReceiver(todosUpdatedReceiver);
+        mgr.unregisterReceiver(todosInsertedReceiver);
+        mgr.unregisterReceiver(todoUpdatedReceiver);
     }
 
     private void addTodo() {
-        new AddTodoFragment().show(getSupportFragmentManager(), "todo");
+        AddTodoFragment addTodoFragment =
+                AddTodoFragment.newInstance(AddTodoFragment.ACTION_INSERT, null);
+
+        addTodoFragment.show(getSupportFragmentManager(), "todoDialog");
     }
 
     @Override

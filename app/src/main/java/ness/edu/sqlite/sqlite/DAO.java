@@ -111,4 +111,16 @@ public class DAO {
         return todos;
     }
 
+    public void updateTodo(long todoID, String mission, String importance) {
+        ContentValues values = new ContentValues();
+        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_IMPORTANCE, importance);
+        values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_MISSION, mission);
+
+        db.update(
+                TodosDBHelper.TodosContract.TBL_TODOS,
+                values,
+                TodosDBHelper.TodosContract.TBL_TODOS_COL_ID +" = " + todoID,
+                null/*new String[]{String.valueOf(todoID)}*/
+                );
+    }
 }

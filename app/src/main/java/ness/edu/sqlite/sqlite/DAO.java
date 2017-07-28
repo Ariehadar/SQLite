@@ -48,13 +48,29 @@ public class DAO {
     /**
      * add todos
      * */
-    public void addTodo(String mission, String importance){
+    public long addTodo(String mission, String importance){
         //maps key value pairs.
         ContentValues values = new ContentValues();
         values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_MISSION, mission);
         values.put(TodosDBHelper.TodosContract.TBL_TODOS_COL_IMPORTANCE, importance);
 
-        db.insert(TodosDBHelper.TodosContract.TBL_TODOS, null, values);
+        long lastInsertedID = db.insert(TodosDBHelper.TodosContract.TBL_TODOS, null, values);
+        System.out.println(lastInsertedID);
+        return lastInsertedID;
+    }
+
+    public long getLastInsertedID(){
+        Cursor cursor = db.rawQuery("SELECT MAX(id) as lastInsertedID FROM Todos", null);
+        if (!cursor.moveToFirst()){
+            throw new RuntimeException("The table is empty");
+        }
+
+        int lastInsertedID = cursor.getInt(cursor.getColumnIndex("lastInsertedID"));
+
+        //"SELECT * FROM sqlite_sequence"
+        cursor.close();
+        System.out.println(lastInsertedID);
+        return lastInsertedID;
     }
 
     public List<Todo> getTodos(){

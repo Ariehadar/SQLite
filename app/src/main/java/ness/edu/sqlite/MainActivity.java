@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver todosUpdatedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //get the new Todo from the intent
             Todo todo = intent.getParcelableExtra("todo");
             todos.add(todo);
             adapter.notifyItemInserted(todos.size() - 1);

@@ -22,9 +22,26 @@ import ness.edu.sqlite.sqlite.DAO;
  */
 public class AddTodoFragment extends BottomSheetDialogFragment implements View.OnClickListener {
 
+    public static final int ACTION_UPDATE = 0;
+    public static final int ACTION_INSERT = 1;
+    public static final String ARG_TODO = "todo";
+    public static final String ARG_ACTION = "action";
+    private int action;
+    private Todo model;
+
     EditText etMission;
     Spinner spImportance; //entries = @array / importance
     Button btnDone;
+
+    public static AddTodoFragment newInstance(int action, Todo model) {
+        Bundle args = new Bundle();
+        args.putInt(ARG_ACTION, action);
+        args.putParcelable(ARG_TODO, model);
+
+        AddTodoFragment fragment = new AddTodoFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,7 +53,20 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
         spImportance = v.findViewById(R.id.spImportance);
         btnDone = v.findViewById(R.id.btnDone);
         btnDone.setOnClickListener(this);
+
+        action = getArguments().getInt(ARG_ACTION);
+        model = getArguments().getParcelable(ARG_TODO);
+        if (action == ACTION_UPDATE)
+            updateUI();
         return v;
+    }
+
+    private void updateUI() {
+        etMission.setText(model.getMission());
+        String[] importance = getResources().getStringArray(R.array.importance);
+        //Arrays.binarySearch(importance, model.getImportance());
+
+        //spImportance.setSelection(model.getImportance());
     }
 
     @Override
@@ -44,18 +74,21 @@ public class AddTodoFragment extends BottomSheetDialogFragment implements View.O
         String mission = etMission.getText().toString();
         String importance = spImportance.getSelectedItem().toString();
 
-
-
+        // A IS B
+        // LSP
 
         //spinner -> selected
-        DAO.getInstance(getContext()).addTodo(mission, importance);
+        DAO dao = DAO.getInstance(getContext());
+
+        long lastInsertedid = dao.addTodo(mission, importance);
+        long lastID = dao.getLastInsertedID();
 
         dismiss();
 
         //prepared statements
 
         //Notify the listeners:
-        Todo todo = new Todo(mission, importance);
+        Todo todo = new Todo((int) lastID, mission, importance);
         Intent intent = new Intent("addedTodo");
         intent.putExtra("todo", todo);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);

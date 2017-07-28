@@ -19,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 import ness.edu.sqlite.dialogs.AddTodoFragment;
 import ness.edu.sqlite.models.Todo;
@@ -139,18 +138,21 @@ public class MainActivity extends AppCompatActivity {
 
     static class TodosAdapter extends RecyclerView.Adapter<TodosAdapter.TodoViewHolder> {
         //properties:
-        private Context context;
         private List<Todo> data;
+        AppCompatActivity activity;
+
         //Constructor:
-        public TodosAdapter(Context context, List<Todo> data) {
-            this.context = context;
+        public TodosAdapter(AppCompatActivity activity, List<Todo> data) {
+            this.activity = activity;
             this.data = data;
         }
         @Override
         public TodoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             //need inflater-> context
-            View itemView = LayoutInflater.from(context).inflate(R.layout.todo_item, parent, false);
-            return new TodoViewHolder(itemView);
+            View itemView = LayoutInflater.from(activity).inflate(R.layout.todo_item, parent, false);
+            TodoViewHolder holder = new TodoViewHolder(itemView);
+            holder.activity = activity;
+            return holder;
         }
         @Override
         public void onBindViewHolder(TodoViewHolder holder, int position) {
@@ -158,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
             Todo todo = data.get(position);
             holder.tvImportance.setText(todo.getImportance());
             holder.tvMission.setText(todo.getMission());
+            holder.model = todo;
         }
         @Override
         public int getItemCount() {
@@ -165,16 +168,24 @@ public class MainActivity extends AppCompatActivity {
             return data.size();
         }
         //find views by id, cache the view finding here.
-        static class TodoViewHolder extends RecyclerView.ViewHolder {
+        static class TodoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             TextView tvMission;
             TextView tvImportance;
             Todo model;
+            AppCompatActivity activity;
 
             public TodoViewHolder(View v) {
                 super(v);
                 tvImportance = v.findViewById(R.id.tvImportance);
                 tvMission = v.findViewById(R.id.tvMission);
+                v.setOnClickListener(this);
+            }
 
+            @Override
+            public void onClick(View view) {
+                //MainActivity a = (MainActivity) view.getContext();
+                AddTodoFragment dialog = AddTodoFragment.newInstance(AddTodoFragment.ACTION_UPDATE, model);
+                dialog.show(activity.getSupportFragmentManager(), "updateDialog");
             }
         }
     }
